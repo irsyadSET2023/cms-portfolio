@@ -1,6 +1,6 @@
 <?php
 
-namespace  App\Services\ImageUpload;
+namespace App\Services\ImageUpload;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -8,16 +8,14 @@ use Spatie\LaravelImageOptimizer\Facades\ImageOptimizer;
 
 class UploadImageService
 {
-
     public function __construct() {}
-
 
     public function uploadImage(UploadedFile $image)
     {
         $originalPath = $image->getPathname();
 
         // Step 1: Convert and compress using GD Library (native in PHP)
-        $resizedPath = storage_path('app/temp/' . uniqid() . '.jpg');
+        $resizedPath = storage_path('app/temp/'.uniqid().'.jpg');
         $this->compressImageGD($originalPath, $resizedPath, 60); // Initial compression (JPEG quality: 60%)
 
         // Step 2: Optimize the resized image with Spatie
@@ -30,18 +28,17 @@ class UploadImageService
         }
 
         // Step 4: Store the final optimized image
-        $finalFilename = 'compressed_' . time() . '.jpg';
-        Storage::disk('public')->put('uploads/' . $finalFilename, file_get_contents($resizedPath));
+        $finalFilename = 'compressed_'.time().'.jpg';
+        Storage::disk('public')->put('uploads/'.$finalFilename, file_get_contents($resizedPath));
 
         // Cleanup temp file
         unlink($resizedPath);
 
-
         return [
             'message' => 'Image successfully uploaded and compressed!',
-            'original_size' => round($image->getSize() / 1024, 2) . ' KB',
-            'compressed_size' => round(filesize(storage_path('app/public/uploads/' . $finalFilename)) / 1024, 2) . ' KB',
-            'path' => asset('storage/uploads/' . $finalFilename),
+            'original_size' => round($image->getSize() / 1024, 2).' KB',
+            'compressed_size' => round(filesize(storage_path('app/public/uploads/'.$finalFilename)) / 1024, 2).' KB',
+            'path' => asset('storage/uploads/'.$finalFilename),
         ];
     }
 
@@ -79,7 +76,7 @@ class UploadImageService
 
         // ✅ Ensure the directory exists before saving
         $directory = dirname($destinationPath);
-        if (!file_exists($directory)) {
+        if (! file_exists($directory)) {
             mkdir($directory, 0777, true);
         }
 

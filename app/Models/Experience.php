@@ -28,13 +28,13 @@ class Experience extends Model
         'description',
         'location',
         'is_current',
-        'industry'
+        'industry',
     ];
 
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
-        'is_current' => 'boolean'
+        'is_current' => 'boolean',
     ];
 
     public function user(): BelongsTo

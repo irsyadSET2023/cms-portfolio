@@ -23,11 +23,11 @@ class Profile extends Model
         'email',
         'fullname',
         'dob',
-        'description'
+        'description',
     ];
 
     protected $casts = [
-        'dob' => 'date'
+        'dob' => 'date',
     ];
 
     public function user(): BelongsTo

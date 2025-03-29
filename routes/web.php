@@ -7,7 +7,6 @@ Route::get('/', function () {
     return Inertia::render('auth/Login');
 })->name('home');
 
-
 Route::middleware('auth')->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('Dashboard');
@@ -17,6 +16,5 @@ Route::middleware('auth')->group(function () {
     })->name('profile');
 });
 
-
-require __DIR__ . '/settings.php';
-require __DIR__ . '/auth.php';
+require __DIR__.'/settings.php';
+require __DIR__.'/auth.php';

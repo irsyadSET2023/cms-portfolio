@@ -46,7 +46,7 @@ return new class extends Migration
                 'contract',
                 'freelance',
                 'internship',
-                'temporary'
+                'temporary',
             ])->default('full-time')
                 ->comment('Type of employment');
 
@@ -71,7 +71,6 @@ return new class extends Migration
             // Soft delete and timestamps
             $table->softDeletes();
             $table->timestamps();
-
 
             // Performance optimization indexes
             $table->index(['user_id', 'start_date', 'end_date']);

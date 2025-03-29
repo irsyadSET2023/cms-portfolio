@@ -29,14 +29,14 @@ class Education extends Model
         'description',
         'is_current',
         'location',
-        'honors'
+        'honors',
     ];
 
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
         'is_current' => 'boolean',
-        'gpa' => 'decimal:2'
+        'gpa' => 'decimal:2',
     ];
 
     public function user(): BelongsTo

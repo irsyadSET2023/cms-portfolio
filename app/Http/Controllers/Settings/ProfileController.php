@@ -30,9 +30,8 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $uploadImageService = new UploadImageService();
+        $uploadImageService = new UploadImageService;
         $request->user()->fill($request->validated());
-
 
         $image = $request->image;
         if ($image) {

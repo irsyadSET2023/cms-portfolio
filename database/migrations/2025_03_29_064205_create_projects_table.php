@@ -18,12 +18,12 @@ return new class extends Migration
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
             $table->string('url')->nullable();
-            
+
             // Polymorphic relationship fields
             $table->ulid('projectable_id');
             $table->string('projectable_type');
             $table->index(['projectable_id', 'projectable_type']);
-            
+
             $table->timestamps();
             $table->softDeletes();
         });

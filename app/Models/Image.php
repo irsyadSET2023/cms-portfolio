@@ -18,13 +18,13 @@ class Image extends Model
         'size',
         'alt_text',
         'order',
-        'is_primary'
+        'is_primary',
     ];
 
     protected $casts = [
         'size' => 'integer',
         'order' => 'integer',
-        'is_primary' => 'boolean'
+        'is_primary' => 'boolean',
     ];
 
     public function imageable(): MorphTo

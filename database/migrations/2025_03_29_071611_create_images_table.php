@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('mime_type', 100)->nullable(false);
             $table->integer('size')->unsigned()->comment('File size in bytes');
             $table->string('alt_text', 255)->nullable();
-            
+
             // Polymorphic relationship fields
             $table->ulid('imageable_id');
             $table->string('imageable_type');
@@ -30,7 +30,7 @@ return new class extends Migration
             // Optional metadata
             $table->integer('order')->default(0)->comment('Order of images when multiple exist');
             $table->boolean('is_primary')->default(false);
-            
+
             // Timestamps and soft deletes
             $table->timestamps();
             $table->softDeletes();
