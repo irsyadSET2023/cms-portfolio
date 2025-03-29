@@ -14,6 +14,12 @@ Route::middleware('auth')->group(function () {
     Route::get('profile', function () {
         return Inertia::render('Profile');
     })->name('profile');
+    Route::get('experience', function () {
+        return Inertia::render('Experience');
+    })->name('experience');
+    Route::get('education', function () {
+        return Inertia::render('Education');
+    })->name('education');
 });
 
 require __DIR__.'/settings.php';
