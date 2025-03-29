@@ -3,7 +3,7 @@ import UserInfo from '@/components/UserInfo.vue';
 import { DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import type { User } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import { LogOut, Monitor } from 'lucide-vue-next';
+import { Lock, LogOut, Monitor } from 'lucide-vue-next';
 
 interface Props {
     user: User;
@@ -27,6 +27,12 @@ defineProps<Props>();
             </Link>
         </DropdownMenuItem>
     </DropdownMenuGroup> -->
+    <DropdownMenuItem :as-child="true">
+        <Link class="block w-full" :href="route('password.edit')" as="button">
+            <Lock class="mr-2 h-4 w-4" />
+            Reset Password
+        </Link>
+    </DropdownMenuItem>
     <DropdownMenuSeparator />
     <DropdownMenuItem :as-child="true">
         <Link class="block w-full" :href="route('appearance')" as="button">
@@ -34,6 +40,7 @@ defineProps<Props>();
             Appearance
         </Link>
     </DropdownMenuItem>
+    <DropdownMenuSeparator />
     <DropdownMenuItem :as-child="true">
         <Link class="block w-full" method="post" :href="route('logout')" as="button">
             <LogOut class="mr-2 h-4 w-4" />

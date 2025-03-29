@@ -12,6 +12,8 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class User extends Authenticatable implements HasMedia
 {
@@ -65,5 +67,20 @@ class User extends Authenticatable implements HasMedia
 
         $this->addMedia($path)
             ->preservingOriginal()->toMediaCollection();
+    }
+
+    public function profile(): HasOne
+    {
+        return $this->hasOne(Profile::class);
+    }
+
+    public function experiences(): HasMany
+    {
+        return $this->hasMany(Experience::class);
+    }
+
+    public function educations(): HasMany
+    {
+        return $this->hasMany(Education::class);
     }
 }

@@ -4,35 +4,30 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Profile extends Model
+class Project extends Model
 {
     use HasUlids, SoftDeletes;
-    //
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
-        'user_id',
-        'email',
-        'fullname',
-        'dob',
-        'description'
+        'title',
+        'description',
+        'start_date',
+        'end_date',
+        'url'
     ];
 
     protected $casts = [
-        'dob' => 'date'
+        'start_date' => 'date',
+        'end_date' => 'date'
     ];
 
-    public function user(): BelongsTo
+    public function projectable(): MorphTo
     {
-        return $this->belongsTo(User::class);
+        return $this->morphTo();
     }
 
     public function images(): MorphMany
