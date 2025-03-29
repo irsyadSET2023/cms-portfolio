@@ -5,6 +5,6 @@
         <AppLogoIcon class="size-5 fill-current text-white dark:text-black" />
     </div> -->
     <div class="ml-1 grid flex-1 text-left text-sm">
-        <span class="mb-0.5 truncate font-semibold leading-none">Irsyad App</span>
+        <span class="mb-0.5 truncate font-semibold leading-none">CMS Portfolio App</span>
     </div>
 </template>
