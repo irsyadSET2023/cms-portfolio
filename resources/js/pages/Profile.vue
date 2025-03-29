@@ -94,10 +94,13 @@ const onSubmit = handleSubmit((values) => {
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="mt-10 flex min-h-screen flex-col space-y-6 px-4 md:px-10">
-            <div class="w-full max-w-lg space-y-6 rounded-lg p-6 shadow-lg">
-                <HeadingSmall title="Profile information" description="Update your name and email address" />
-                <form @submit.prevent="onSubmit" enctype="multipart/form-data" class="space-y-5">
+        <div class="mx-auto mt-10 max-w-4xl px-4 pb-20 md:px-6">
+            <div class="mb-8">
+                <HeadingSmall title="Profile Information" description="Update your personal information" />
+            </div>
+
+            <div class="rounded-lg border bg-card p-6 shadow-sm transition-all hover:shadow-md">
+                <form @submit.prevent="onSubmit" enctype="multipart/form-data" class="space-y-6">
                     <FormField name="image" v-slot="{ componentField }">
                         <FormItem>
                             <FormLabel>Profile Image</FormLabel>
@@ -107,45 +110,47 @@ const onSubmit = handleSubmit((values) => {
                         </FormItem>
                     </FormField>
 
-                    <FormField name="name" v-slot="{ componentField }">
-                        <FormItem>
-                            <FormLabel required>Name</FormLabel>
-                            <FormControl>
-                                <Input type="text" v-model="form.name" v-bind="componentField" />
-                            </FormControl>
-                        </FormItem>
-                    </FormField>
-                    <FormField name="email" v-slot="{ componentField }">
-                        <FormItem>
-                            <FormLabel required>Email</FormLabel>
-                            <FormControl>
-                                <Input type="text" v-model="form.email" v-bind="componentField" />
-                            </FormControl>
-                        </FormItem>
-                    </FormField>
+                    <div class="grid gap-6 sm:grid-cols-2">
+                        <FormField name="name" v-slot="{ componentField }">
+                            <FormItem>
+                                <FormLabel required>Name</FormLabel>
+                                <FormControl>
+                                    <Input type="text" v-model="form.name" v-bind="componentField" placeholder="Enter your name" />
+                                </FormControl>
+                            </FormItem>
+                        </FormField>
+
+                        <FormField name="email" v-slot="{ componentField }">
+                            <FormItem>
+                                <FormLabel required>Email</FormLabel>
+                                <FormControl>
+                                    <Input type="text" v-model="form.email" v-bind="componentField" placeholder="Enter your email" />
+                                </FormControl>
+                            </FormItem>
+                        </FormField>
+                    </div>
+
                     <FormField v-slot="{ componentField, errorMessage }" name="description">
-                        <FormItem class="w-full max-w-lg lg:max-w-4xl">
+                        <FormItem class="w-full">
                             <FormLabel required>Description</FormLabel>
                             <FormControl>
-                                <div
-                                    :class="{
-                                        'border border-red-300': errorMessage,
-                                    }"
-                                >
+                                <div :class="['rounded-md', errorMessage ? 'border-destructive' : 'border-input']">
                                     <QuillEditor
                                         v-model:content="content"
                                         content-type="html"
                                         theme="snow"
                                         v-bind="componentField"
                                         v-on:update:content="form.description = $event"
+                                        class="min-h-[200px]"
                                     />
                                 </div>
                             </FormControl>
                             <FormMessage />
                         </FormItem>
                     </FormField>
-                    <div class="mt-5">
-                        <Button type="submit"> Submit </Button>
+
+                    <div class="mt-8 flex justify-end">
+                        <Button type="submit" size="lg">Save Profile</Button>
                     </div>
                 </form>
             </div>

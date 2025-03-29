@@ -5,13 +5,14 @@ namespace App\Services\ImageUpload;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Spatie\LaravelImageOptimizer\Facades\ImageOptimizer;
-
+use Illuminate\Support\Str;
 class UploadImageService
 {
     public function __construct() {}
 
-    public function uploadImage(UploadedFile $image)
+    public function uploadImage(UploadedFile $image,string $fileSystem='s3', string $path, string $filename,bool $isPublic=false)
     {
+        try {
         $originalPath = $image->getPathname();
 
         // Step 1: Convert and compress using GD Library (native in PHP)
@@ -27,19 +28,33 @@ class UploadImageService
             ImageOptimizer::optimize($resizedPath);
         }
 
+        $generatedUlid = Str::ulid();
+
         // Step 4: Store the final optimized image
-        $finalFilename = 'compressed_'.time().'.jpg';
-        Storage::disk('public')->put('uploads/'.$finalFilename, file_get_contents($resizedPath));
+        $finalFilename = $path . '/'.$filename.'_'.$generatedUlid.'.jpg';
+        Storage::disk($fileSystem)->put($finalFilename, file_get_contents($resizedPath));
 
         // Cleanup temp file
         unlink($resizedPath);
 
         return [
+            'success' => true,
             'message' => 'Image successfully uploaded and compressed!',
             'original_size' => round($image->getSize() / 1024, 2).' KB',
-            'compressed_size' => round(filesize(storage_path('app/public/uploads/'.$finalFilename)) / 1024, 2).' KB',
-            'path' => asset('storage/uploads/'.$finalFilename),
+            'compressed_size' => round(Storage::disk($fileSystem)->size($finalFilename) / 1024, 2).' KB',
+            'path' =>
+            $fileSystem == 's3' ?
+            env('AWS_URL') . '/' . $finalFilename :
+            Storage::url($finalFilename),
         ];
+        } catch (\Throwable $th) {
+            return [
+                'success' => false,
+                'message' => 'Image upload failed',
+                'error' => $th->getMessage(),
+            ];
+        }
+     
     }
 
     private function compressImageGD($sourcePath, $destinationPath, $quality)

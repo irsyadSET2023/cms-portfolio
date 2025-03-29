@@ -30,13 +30,16 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
+
         $uploadImageService = new UploadImageService;
         $request->user()->fill($request->validated());
 
         $image = $request->image;
         if ($image) {
-            $imageMetadata = $uploadImageService->uploadImage($image);
+            $imageMetadata = $uploadImageService->uploadImage($image, 's3', 'profile_pictures', $image->getClientOriginalName());
         }
+
+        dd($imageMetadata);
 
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
