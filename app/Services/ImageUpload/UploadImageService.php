@@ -32,7 +32,8 @@ class UploadImageService
 
         // Step 4: Store the final optimized image
         $finalFilename = $path . '/'.$filename.'_'.$generatedUlid.'.jpg';
-        Storage::disk($fileSystem)->put($finalFilename, file_get_contents($resizedPath));
+        $options = $isPublic ? ['visibility' => 'public'] : [];
+        Storage::disk($fileSystem)->put($finalFilename, file_get_contents($resizedPath), $options);
 
         // Cleanup temp file
         unlink($resizedPath);

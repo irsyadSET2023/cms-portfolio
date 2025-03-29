@@ -67,8 +67,8 @@ return new class extends Migration
                 ->comment('Academic honors or achievements');
 
             // Soft delete and timestamps
-            $table->softDeletes();
             $table->timestamps();
+            $table->softDeletes();
 
             // Unique constraint to prevent duplicate entries
             // $table->unique([

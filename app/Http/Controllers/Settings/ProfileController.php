@@ -36,7 +36,7 @@ class ProfileController extends Controller
 
         $image = $request->image;
         if ($image) {
-            $imageMetadata = $uploadImageService->uploadImage($image, 's3', 'profile_pictures', $image->getClientOriginalName());
+            $imageMetadata = $uploadImageService->uploadImage($image, 's3', 'profile_pictures', $image->getClientOriginalName(),true);
         }
 
         dd($imageMetadata);

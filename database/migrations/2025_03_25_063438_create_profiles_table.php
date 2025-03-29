@@ -20,8 +20,9 @@ return new class extends Migration
             $table->string('fullname');
             $table->date('dob');
             $table->text('description');
-            $table->softDeletes();
             $table->timestamps();
+            $table->softDeletes();
+
         });
     }
 

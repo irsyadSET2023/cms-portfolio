@@ -69,8 +69,8 @@ return new class extends Migration
                 ->comment('Industry or sector of the company');
 
             // Soft delete and timestamps
-            $table->softDeletes();
             $table->timestamps();
+            $table->softDeletes();
 
             // Performance optimization indexes
             $table->index(['user_id', 'start_date', 'end_date']);
