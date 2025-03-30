@@ -3,6 +3,7 @@ import { useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
 import HeadingSmall from '@/components/HeadingSmall.vue';
+import SaveProfileConfirmDialog from '@/components/profile/SaveProfleConfirmDialog.vue';
 import DragDropImageUploader from '@/components/reusable/DragDropImageUploader.vue';
 import { Button } from '@/components/ui/button';
 import { FormControl, FormField, FormLabel, FormMessage } from '@/components/ui/form';
@@ -81,13 +82,23 @@ const getFile = (file: File | File[]) => {
     }
 };
 
-const onSubmit = handleSubmit((values) => {
-    // Ensure form data is properly set
-    form.name = values.name;
-    form.email = values.email;
-    form.description = content.value || '';
-    form.dob = values.dob;
+const showConfirmDialog = ref(false);
 
+const onSubmit = handleSubmit(() => {
+    showConfirmDialog.value = true;
+});
+
+const handleConfirmedSubmit = () => {
+    // Close the dialog
+    showConfirmDialog.value = false;
+
+    // Set form values
+    form.name = form.name;
+    form.email = form.email;
+    form.description = content.value || '';
+    form.dob = form.dob;
+
+    // Submit the form
     form.post(route('profile.update'), {
         preserveScroll: true,
         onSuccess: (response) => {
@@ -102,11 +113,6 @@ const onSubmit = handleSubmit((values) => {
             }
         },
         onError: (errors) => {
-            // Map backend errors to form fields
-            // Object.keys(errors).forEach((key) => {
-            //     setFieldError(key, errors[key]);
-            // });
-
             toast({
                 title: 'Error',
                 description: 'Please check the form for errors',
@@ -115,7 +121,7 @@ const onSubmit = handleSubmit((values) => {
             });
         },
     });
-});
+};
 
 const handleRemoveImage = () => {
     form.image = null;
@@ -127,6 +133,7 @@ const handleRemoveImage = () => {
 
 <template>
     <Toaster />
+    <SaveProfileConfirmDialog v-model:open="showConfirmDialog" @confirm="handleConfirmedSubmit" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="mx-auto mt-10 max-w-4xl px-4 pb-20 md:px-6">
