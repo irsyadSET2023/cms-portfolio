@@ -34,6 +34,7 @@ const emit = defineEmits<{
     (e: 'update:modelValue', file: File | File[] | null): void;
     (e: 'image-uploaded', file: File | File[]): void;
     (e: 'image-removed', index?: number): void;
+    (e: 'remove-existing'): void;
 }>();
 
 // Reactive state
@@ -173,6 +174,7 @@ const removeSingleImage = (): void => {
     singlePreview.value = null;
     emit('update:modelValue', null);
     emit('image-removed');
+    emit('remove-existing');
     if (fileInput.value) {
         fileInput.value.value = '';
     }

@@ -44,7 +44,7 @@ const formSchema = toTypedSchema(
 
 const profile = ref<Profile>(props.profile as Profile);
 
-const existingImageUrl = profile?.value?.image_url ? [profile?.value?.image_url] : [];
+console.log('Profile Rendered', profile.value);
 
 const { handleSubmit, setFieldError, resetField, defineField, setFieldValue } = useVeeForm({
     validationSchema: formSchema,
@@ -117,10 +117,12 @@ const onSubmit = handleSubmit((values) => {
     });
 });
 
-function handleRemoveImage() {
+const handleRemoveImage = () => {
     form.image = null;
     setFieldValue('image', null);
-}
+    profile.value.image_url = null;
+    console.log('Profile', profile.value);
+};
 </script>
 
 <template>
@@ -142,9 +144,10 @@ function handleRemoveImage() {
                                     v-bind="componentField"
                                     :multiple="false"
                                     v-model="form.image"
-                                    :existing-image-url="props?.profile?.image_url ? [props?.profile?.image_url] : []"
+                                    :existing-image-url="profile?.image_url ? [profile?.image_url] : []"
                                     @image-uploaded="getFile"
-                                    @handle-remove="handleRemoveImage"
+                                    @image-removed="handleRemoveImage"
+                                    @remove-existing="handleRemoveImage"
                                 />
                             </FormControl>
                         </FormItem>

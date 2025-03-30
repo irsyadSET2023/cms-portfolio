@@ -37,7 +37,7 @@ export interface Profile {
     id: number;
     fullname: string;
     email: string;
-    image_url?: string;
+    image_url?: string | null;
     description?: string;
     dob?: string;
 }
