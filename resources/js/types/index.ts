@@ -33,4 +33,12 @@ export interface User {
     updated_at: string;
 }
 
+export interface Profile {
+    id: number;
+    fullname: string;
+    email: string;
+    image_url?: string;
+    description?: string;
+    dob?: string;
+}
 export type BreadcrumbItemType = BreadcrumbItem;

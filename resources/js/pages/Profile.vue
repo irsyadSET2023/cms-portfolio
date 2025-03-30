@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useForm, usePage } from '@inertiajs/vue3';
+import { useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
 import HeadingSmall from '@/components/HeadingSmall.vue';
@@ -10,18 +10,17 @@ import FormItem from '@/components/ui/form/FormItem.vue';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/toast';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { type BreadcrumbItem, type SharedData, type User } from '@/types';
+import { Profile, type BreadcrumbItem } from '@/types';
 import { toTypedSchema } from '@vee-validate/zod';
 import { QuillEditor } from '@vueup/vue-quill';
 import { useForm as useVeeForm } from 'vee-validate';
 import { z } from 'zod';
 
 interface Props {
-    mustVerifyEmail: boolean;
-    status?: string;
+    profile: Profile;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -36,28 +35,31 @@ const formSchema = toTypedSchema(
         email: z.string(),
         image: z.any(),
         description: z.string().optional(),
+        dob: z.string().optional(),
     }),
 );
 
-const page = usePage<SharedData>();
-const user = ref<User>(page.props.auth.user as User); // Make user reactive
+const profile = ref<Profile>(props.profile as Profile);
 
 const { handleSubmit, setFieldError, resetField, defineField } = useVeeForm({
     validationSchema: formSchema,
     initialValues: {
-        name: user.value.name,
-        email: user.value.email,
+        name: profile?.value?.fullname,
+        email: profile?.value?.email,
         image: null,
+        dob: profile?.value?.dob ? new Date(profile?.value?.dob).toISOString().split('T')[0] : '',
+        description: profile?.value?.description || '',
     },
 });
 
 const [content] = defineField('description');
 
-const form = useForm<{ name: string; email: string; image: File | File[] | null; description: string }>({
-    name: user.value.name,
-    email: user.value.email,
+const form = useForm<{ name: string; email: string; image: File | File[] | null; description: string; dob: string }>({
+    name: profile?.value?.fullname,
+    email: profile?.value?.email,
     image: null,
-    description: '',
+    description: profile?.value?.description || '',
+    dob: profile?.value?.dob ? new Date(profile?.value?.dob).toISOString().split('T')[0] : '',
 });
 
 const getFile = (file: File | File[]) => {
@@ -72,19 +74,32 @@ const getFile = (file: File | File[]) => {
 };
 
 const onSubmit = handleSubmit((values) => {
-    console.log(form.image, form.name, form.email);
+    // Ensure form data is properly set
+    form.name = values.name;
+    form.email = values.email;
+    form.description = content.value || ''; // Use the QuillEditor content
+    form.dob = values.dob || '';
 
     form.post(route('profile.update'), {
-        onSuccess: () => {
-            toast({
-                title: 'Success',
-                description: 'Success update Profile',
-            });
+        preserveScroll: true,
+        onSuccess: (response) => {
+            if (response?.props?.success) {
+                toast({
+                    title: 'Success',
+                    description: response.props.success as string,
+                });
+            } else if (response?.props?.error) {
+                toast({
+                    title: 'Error',
+                    description: response.props.error as string,
+                    variant: 'destructive',
+                });
+            }
         },
         onError: (errors) => {
             toast({
                 title: 'Error',
-                description: 'Error updating profile',
+                description: 'Please check the form for errors',
                 variant: 'destructive',
             });
         },
@@ -105,7 +120,13 @@ const onSubmit = handleSubmit((values) => {
                         <FormItem>
                             <FormLabel>Profile Image</FormLabel>
                             <FormControl>
-                                <DragDropImageUploader v-bind="componentField" :multiple="false" v-model="form.image" @image-uploaded="getFile" />
+                                <DragDropImageUploader
+                                    v-bind="componentField"
+                                    :multiple="false"
+                                    v-model="form.image"
+                                    :existing-image-url="props?.profile?.image_url"
+                                    @image-uploaded="getFile"
+                                />
                             </FormControl>
                         </FormItem>
                     </FormField>
@@ -129,6 +150,15 @@ const onSubmit = handleSubmit((values) => {
                             </FormItem>
                         </FormField>
                     </div>
+
+                    <FormField name="dob" v-slot="{ componentField }">
+                        <FormItem>
+                            <FormLabel required>Date of Birth</FormLabel>
+                            <FormControl>
+                                <Input type="date" v-model="form.dob" v-bind="componentField" placeholder="Enter your date of birth" />
+                            </FormControl>
+                        </FormItem>
+                    </FormField>
 
                     <FormField v-slot="{ componentField, errorMessage }" name="description">
                         <FormItem class="w-full">

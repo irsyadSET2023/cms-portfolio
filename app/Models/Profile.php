@@ -24,6 +24,7 @@ class Profile extends Model
         'fullname',
         'dob',
         'description',
+        'image_url'
     ];
 
     protected $casts = [

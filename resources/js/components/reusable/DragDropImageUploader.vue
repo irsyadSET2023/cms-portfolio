@@ -17,6 +17,8 @@ interface Props {
     acceptedFileTypes?: string[];
     /** Model value (selected file or files) */
     modelValue?: File | File[] | null;
+    /** Existing image URL */
+    existingImageUrl?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -25,6 +27,7 @@ const props = withDefaults(defineProps<Props>(), {
     maxFileSize: 5 * 1024 * 1024,
     acceptedFileTypes: () => ['image/jpeg', 'image/png', 'image/gif', 'image/svg'],
     modelValue: null,
+    existingImageUrl: '',
 });
 
 const emit = defineEmits<{
@@ -42,6 +45,9 @@ const fileInput = ref<HTMLInputElement | null>(null);
 
 // Computed properties
 const isEmpty = computed((): boolean => {
+    if (props.existingImageUrl && !props.multiple && !singlePreview.value) {
+        return false;
+    }
     return props.multiple ? filePreviews.value.length === 0 : !singlePreview.value;
 });
 
@@ -235,8 +241,8 @@ const removeImage = (index: number): void => {
         </div>
 
         <!-- Single image preview -->
-        <div v-else-if="!multiple && singlePreview" class="relative h-64 w-64 overflow-hidden rounded-lg border">
-            <img :src="singlePreview" alt="Preview" class="max-h-64 w-full object-cover" />
+        <div v-else-if="!multiple && (singlePreview || existingImageUrl)" class="relative h-64 w-64 overflow-hidden rounded-lg border">
+            <img :src="singlePreview || existingImageUrl" alt="Preview" class="max-h-64 w-full object-cover" />
             <button
                 class="absolute right-2 top-2 rounded-full bg-background/80 p-1 text-foreground shadow-sm transition-colors hover:bg-background"
                 @click="removeSingleImage"

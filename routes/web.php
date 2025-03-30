@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -12,7 +13,10 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
     Route::get('profile', function () {
-        return Inertia::render('Profile');
+        $user = Auth::user()->fresh()->load('profile');
+        return Inertia::render('Profile', [
+            'profile' => $user->profile,
+        ]);
     })->name('profile');
     Route::get('experience', function () {
         return Inertia::render('Experience');
