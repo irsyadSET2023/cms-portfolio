@@ -244,9 +244,9 @@ const removeImage = (index: number): void => {
         <div v-else-if="!multiple && (singlePreview || existingImageUrl)" class="relative h-64 w-64 overflow-hidden rounded-lg border">
             <img :src="singlePreview || existingImageUrl" alt="Preview" class="max-h-64 w-full object-cover" />
             <button
-                class="absolute right-2 top-2 rounded-full bg-background/80 p-1 text-foreground shadow-sm transition-colors hover:bg-background"
-                @click="removeSingleImage"
                 type="button"
+                class="absolute right-2 top-2 rounded-full bg-background/80 p-1 text-foreground shadow-sm transition-colors hover:bg-background"
+                @click.stop="removeSingleImage"
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"

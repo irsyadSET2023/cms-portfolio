@@ -31,21 +31,21 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 const formSchema = toTypedSchema(
     z.object({
-        name: z.string(),
-        email: z.string(),
+        name: z.string().min(1, 'Name is required'),
+        email: z.string().min(1, 'Email is required').email('Invalid email format'),
         image: z.any(),
         description: z.string().optional(),
-        dob: z.string().optional(),
+        dob: z.string().min(1, 'Date of birth is required'),
     }),
 );
 
 const profile = ref<Profile>(props.profile as Profile);
 
-const { handleSubmit, setFieldError, resetField, defineField } = useVeeForm({
+const { handleSubmit, setFieldError, resetField, defineField, setFieldValue } = useVeeForm({
     validationSchema: formSchema,
     initialValues: {
-        name: profile?.value?.fullname,
-        email: profile?.value?.email,
+        name: profile?.value?.fullname || '',
+        email: profile?.value?.email || '',
         image: null,
         dob: profile?.value?.dob ? new Date(profile?.value?.dob).toISOString().split('T')[0] : '',
         description: profile?.value?.description || '',
@@ -59,17 +59,20 @@ const form = useForm<{ name: string; email: string; image: File | File[] | null;
     email: profile?.value?.email,
     image: null,
     description: profile?.value?.description || '',
-    dob: profile?.value?.dob ? new Date(profile?.value?.dob).toISOString().split('T')[0] : '',
+    dob: profile?.value?.dob ? new Date(profile?.value?.dob).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
 });
 
 const getFile = (file: File | File[]) => {
     resetField('image');
     if (Array.isArray(file) && file.length > 0) {
-        form.image = file; // Take the first file from the array
+        form.image = file[0]; // Take the first file from the array
+        setFieldValue('image', file[0]);
     } else if (file instanceof File) {
         form.image = file;
+        setFieldValue('image', file);
     } else {
         form.image = null;
+        setFieldValue('image', null);
     }
 };
 
@@ -77,8 +80,8 @@ const onSubmit = handleSubmit((values) => {
     // Ensure form data is properly set
     form.name = values.name;
     form.email = values.email;
-    form.description = content.value || ''; // Use the QuillEditor content
-    form.dob = values.dob || '';
+    form.description = content.value || '';
+    form.dob = values.dob;
 
     form.post(route('profile.update'), {
         preserveScroll: true,
@@ -88,15 +91,14 @@ const onSubmit = handleSubmit((values) => {
                     title: 'Success',
                     description: response.props.success as string,
                 });
-            } else if (response?.props?.error) {
-                toast({
-                    title: 'Error',
-                    description: response.props.error as string,
-                    variant: 'destructive',
-                });
             }
         },
         onError: (errors) => {
+            // Map backend errors to form fields
+            Object.keys(errors).forEach((key) => {
+                setFieldError(key, errors[key]);
+            });
+
             toast({
                 title: 'Error',
                 description: 'Please check the form for errors',
@@ -155,7 +157,13 @@ const onSubmit = handleSubmit((values) => {
                         <FormItem>
                             <FormLabel required>Date of Birth</FormLabel>
                             <FormControl>
-                                <Input type="date" v-model="form.dob" v-bind="componentField" placeholder="Enter your date of birth" />
+                                <Input
+                                    type="date"
+                                    v-model="form.dob"
+                                    v-bind="componentField"
+                                    placeholder="Enter your date of birth"
+                                    class="[&::-webkit-calendar-picker-indicator]:dark:invert"
+                                />
                             </FormControl>
                         </FormItem>
                     </FormField>
