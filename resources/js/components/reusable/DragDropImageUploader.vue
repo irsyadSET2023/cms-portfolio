@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 interface FilePreview {
     file: File;
@@ -17,8 +17,8 @@ interface Props {
     acceptedFileTypes?: string[];
     /** Model value (selected file or files) */
     modelValue?: File | File[] | null;
-    /** Existing image URL */
-    existingImageUrl?: string;
+    /** Existing image URL - modified to always be an array */
+    existingImageUrl?: string[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -27,7 +27,7 @@ const props = withDefaults(defineProps<Props>(), {
     maxFileSize: 5 * 1024 * 1024,
     acceptedFileTypes: () => ['image/jpeg', 'image/png', 'image/gif', 'image/svg'],
     modelValue: null,
-    existingImageUrl: '',
+    existingImageUrl: () => [],
 });
 
 const emit = defineEmits<{
@@ -45,10 +45,10 @@ const fileInput = ref<HTMLInputElement | null>(null);
 
 // Computed properties
 const isEmpty = computed((): boolean => {
-    if (props.existingImageUrl && !props.multiple && !singlePreview.value) {
-        return false;
+    if (props.multiple) {
+        return filePreviews.value.length === 0 && props.existingImageUrl.length === 0;
     }
-    return props.multiple ? filePreviews.value.length === 0 : !singlePreview.value;
+    return !singlePreview.value && props.existingImageUrl.length === 0;
 });
 
 const fileTypesFormatted = computed((): string => {
@@ -191,6 +191,27 @@ const removeImage = (index: number): void => {
 
     emit('image-removed', index);
 };
+
+// Add new method to handle existing images
+const initializeExistingImages = (): void => {
+    if (props.multiple && props.existingImageUrl.length > 0) {
+        filePreviews.value = props.existingImageUrl.map((url) => ({
+            file: new File([], ''), // Empty file as placeholder
+            url: url,
+        }));
+    } else if (!props.multiple && props.existingImageUrl.length > 0) {
+        singlePreview.value = props.existingImageUrl[0];
+    }
+};
+
+// Add watch to handle changes in existingImageUrl
+watch(
+    () => props.existingImageUrl,
+    () => {
+        initializeExistingImages();
+    },
+    { immediate: true },
+);
 </script>
 
 <template>
@@ -241,8 +262,8 @@ const removeImage = (index: number): void => {
         </div>
 
         <!-- Single image preview -->
-        <div v-else-if="!multiple && (singlePreview || existingImageUrl)" class="relative h-64 w-64 overflow-hidden rounded-lg border">
-            <img :src="singlePreview || existingImageUrl" alt="Preview" class="max-h-64 w-full object-cover" />
+        <div v-else-if="!multiple && (singlePreview || existingImageUrl.length > 0)" class="relative h-64 w-64 overflow-hidden rounded-lg border">
+            <img :src="singlePreview || existingImageUrl[0]" alt="Preview" class="max-h-64 w-full object-cover" />
             <button
                 type="button"
                 class="absolute right-2 top-2 rounded-full bg-background/80 p-1 text-foreground shadow-sm transition-colors hover:bg-background"

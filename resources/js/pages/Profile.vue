@@ -44,6 +44,8 @@ const formSchema = toTypedSchema(
 
 const profile = ref<Profile>(props.profile as Profile);
 
+const existingImageUrl = profile?.value?.image_url ? [profile?.value?.image_url] : [];
+
 const { handleSubmit, setFieldError, resetField, defineField, setFieldValue } = useVeeForm({
     validationSchema: formSchema,
     initialValues: {
@@ -114,6 +116,11 @@ const onSubmit = handleSubmit((values) => {
         },
     });
 });
+
+function handleRemoveImage() {
+    form.image = null;
+    setFieldValue('image', null);
+}
 </script>
 
 <template>
@@ -135,8 +142,9 @@ const onSubmit = handleSubmit((values) => {
                                     v-bind="componentField"
                                     :multiple="false"
                                     v-model="form.image"
-                                    :existing-image-url="props?.profile?.image_url"
+                                    :existing-image-url="props?.profile?.image_url ? [props?.profile?.image_url] : []"
                                     @image-uploaded="getFile"
+                                    @handle-remove="handleRemoveImage"
                                 />
                             </FormControl>
                         </FormItem>
@@ -181,14 +189,14 @@ const onSubmit = handleSubmit((values) => {
                         <FormItem class="w-full">
                             <FormLabel required>Description</FormLabel>
                             <FormControl>
-                                <div :class="['rounded-md', errorMessage ? 'border-destructive' : 'border-input']">
+                                <div :class="['overflow-hidden rounded-md', errorMessage ? 'border-destructive' : 'border-input']">
                                     <QuillEditor
                                         v-model:content="content"
                                         content-type="html"
                                         theme="snow"
                                         v-bind="componentField"
                                         v-on:update:content="form.description = $event"
-                                        class="min-h-[200px]"
+                                        class="min-h-[200px] [&_.ql-editor]:overflow-x-hidden [&_.ql-editor]:whitespace-pre-wrap [&_.ql-editor]:break-all"
                                     />
                                 </div>
                             </FormControl>
