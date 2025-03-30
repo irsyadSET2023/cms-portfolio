@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/button';
 import { FormControl, FormField, FormLabel, FormMessage } from '@/components/ui/form';
 import FormItem from '@/components/ui/form/FormItem.vue';
 import { Input } from '@/components/ui/input';
-import { toast } from '@/components/ui/toast';
+import { useToast } from '@/components/ui/toast';
+import Toaster from '@/components/ui/toast/Toaster.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Profile, type BreadcrumbItem } from '@/types';
 import { toTypedSchema } from '@vee-validate/zod';
@@ -28,6 +29,8 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/profile',
     },
 ];
+
+const { toast } = useToast();
 
 const formSchema = toTypedSchema(
     z.object({
@@ -86,23 +89,27 @@ const onSubmit = handleSubmit((values) => {
     form.post(route('profile.update'), {
         preserveScroll: true,
         onSuccess: (response) => {
+            console.log('Success Response', response?.props?.success);
+
             if (response?.props?.success) {
                 toast({
                     title: 'Success',
                     description: response.props.success as string,
+                    duration: 3000,
                 });
             }
         },
         onError: (errors) => {
             // Map backend errors to form fields
-            Object.keys(errors).forEach((key) => {
-                setFieldError(key, errors[key]);
-            });
+            // Object.keys(errors).forEach((key) => {
+            //     setFieldError(key, errors[key]);
+            // });
 
             toast({
                 title: 'Error',
                 description: 'Please check the form for errors',
                 variant: 'destructive',
+                duration: 3000,
             });
         },
     });
@@ -110,6 +117,8 @@ const onSubmit = handleSubmit((values) => {
 </script>
 
 <template>
+    <Toaster />
+
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="mx-auto mt-10 max-w-4xl px-4 pb-20 md:px-6">
             <div class="mb-8">

@@ -72,6 +72,7 @@ class ProfileController extends Controller
             }
 
 
+
     
             return Inertia::render('Profile', [
                 'success' => 'Profile updated successfully',

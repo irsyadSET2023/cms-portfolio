@@ -3,7 +3,7 @@ import type { ToastProps } from '.'
 import { computed, ref } from 'vue'
 
 const TOAST_LIMIT = 1
-const TOAST_REMOVE_DELAY = 1000000
+const TOAST_REMOVE_DELAY = 3000
 
 export type StringOrVNode =
   | string
@@ -141,6 +141,9 @@ function toast(props: Toast) {
     })
 
   const dismiss = () => dispatch({ type: actionTypes.DISMISS_TOAST, toastId: id })
+
+
+  console.log('Toast props', props);
 
   dispatch({
     type: actionTypes.ADD_TOAST,
